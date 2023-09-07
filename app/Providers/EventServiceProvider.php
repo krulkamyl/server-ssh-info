@@ -2,35 +2,70 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use App\Events\CpuValueExceeded;
+use App\Events\CpuValueExceededResolved;
+use App\Events\RamValueExceeded;
+use App\Events\RamValueExceededResolved;
+use App\Events\ServerDown;
+use App\Events\ServerHistoryCreated;
+use App\Events\ServerUp;
+use App\Events\ServiceDown;
+use App\Events\ServiceUp;
+use App\Listeners\EventRemoveAndNotificateAboutProblemResolved;
+use App\Listeners\EventSaveAndNotificateAboutProblem;
+use App\Listeners\ServerParameterThresholdListener;
+use App\Models\Notification;
+use App\Models\ServerHistory;
+use App\Observers\NotificationObserver;
+use App\Observers\ServerHistoryObserver;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * The event to listener mappings for the application.
-     *
-     * @var array<class-string, array<int, class-string>>
-     */
     protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
+        ServerHistoryCreated::class  => [
+            ServerParameterThresholdListener::class
+        ],
+
+        ServiceDown::class => [
+            EventSaveAndNotificateAboutProblem::class,
+        ],
+
+        ServiceUp::class => [
+            EventRemoveAndNotificateAboutProblemResolved::class,
+        ],
+
+        ServerDown::class => [
+            EventSaveAndNotificateAboutProblem::class,
+        ],
+
+        ServerUp::class => [
+            EventRemoveAndNotificateAboutProblemResolved::class,
+        ],
+
+        CpuValueExceeded::class => [
+            EventSaveAndNotificateAboutProblem::class,
+        ],
+
+        CpuValueExceededResolved::class => [
+            EventRemoveAndNotificateAboutProblemResolved::class,
+        ],
+
+        RamValueExceeded::class => [
+            EventSaveAndNotificateAboutProblem::class,
+        ],
+
+        RamValueExceededResolved::class => [
+            EventRemoveAndNotificateAboutProblemResolved::class
         ],
     ];
 
-    /**
-     * Register any events for your application.
-     */
     public function boot(): void
     {
-        //
+        ServerHistory::observe(ServerHistoryObserver::class);
+        Notification::observe(NotificationObserver::class);
     }
 
-    /**
-     * Determine if events and listeners should be automatically discovered.
-     */
     public function shouldDiscoverEvents(): bool
     {
         return false;

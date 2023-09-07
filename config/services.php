@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'id_rsa_key_base64' => env('ID_RSA_KEY_BASE64'),
+    'servers' => json_decode(env('SERVERS', [])),
+
+    'discord' => [
+        'token' => env('DISCORD_TOKEN'),
+        'error_channel' => env('DISCORD_NOTIFICATION_ERROR_CHANNEL'),
+    ],
 ];
