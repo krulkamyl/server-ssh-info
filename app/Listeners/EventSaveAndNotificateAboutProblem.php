@@ -13,7 +13,9 @@ class EventSaveAndNotificateAboutProblem
     public function handle(object $event): void
     {
         $check = Notification::where('hostname', $event->hostname)
-            ->where('type', $event->type->name)->exists();
+            ->where('type', $event->type->name)
+            ->where('value', $event->value)
+            ->exists();
 
         if (!$check) {
             $notification = new Notification();
