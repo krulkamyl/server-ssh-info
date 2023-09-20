@@ -25,6 +25,6 @@ class UpNotification extends Notification
 
     public function toDiscord($notifiable = null)
     {
-        return DiscordMessage::create("🟢 [**{$this->notification->hostname}**] @here ". sprintf($this->notification->type->messageableResolve(), $this->notification->value ?? ''). sprintf( " (downtime from: %s)", $this->notification->created_at->diffForHumans()));
+        return DiscordMessage::create("🟢 [**{$this->notification->hostname}**] ". sprintf($this->notification->type->messageableResolve(), $this->notification->value ?? ''). sprintf( " (downtime from: %s)", $this->notification->created_at->diffForHumans()));
     }
 }
